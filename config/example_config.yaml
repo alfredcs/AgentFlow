@@ -1,0 +1,74 @@
+# Example AgentFlow Configuration
+
+# AWS Configuration
+aws:
+  region: us-east-1
+  profile: default
+  bedrock:
+    endpoint_url: null  # Optional: custom endpoint
+    max_connections: 10
+    timeout: 300
+
+# Workflow Defaults
+workflow:
+  max_retries: 3
+  timeout_seconds: 300
+  enable_parallel: true
+  log_level: INFO
+
+# Agent Defaults
+agent:
+  default_model: haiku_4_5
+  temperature: 0.7
+  max_tokens: 4096
+
+# Model Configuration
+models:
+  sonnet_4:
+    model_id: anthropic.claude-sonnet-4-20250514
+    use_cases:
+      - complex_reasoning
+      - creative_writing
+      - code_generation
+    max_tokens: 200000
+    
+  haiku_4_5:
+    model_id: anthropic.claude-haiku-4-5-20250514
+    use_cases:
+      - simple_tasks
+      - summarization
+      - classification
+    max_tokens: 200000
+
+# Logging Configuration
+logging:
+  level: INFO
+  format: json
+  cloudwatch:
+    enabled: true
+    log_group: /aws/agentflow/production
+    stream_name_prefix: workflow
+
+# Monitoring
+monitoring:
+  metrics_enabled: true
+  metrics_namespace: AgentFlow
+  
+  alerts:
+    error_rate_threshold: 5.0  # percentage
+    latency_threshold: 30000   # milliseconds
+    
+# Performance
+performance:
+  max_concurrent_workflows: 100
+  max_parallel_steps: 10
+  connection_pool_size: 20
+
+# Security
+security:
+  enable_input_validation: true
+  max_input_size: 1000000  # bytes
+  allowed_tools:
+    - calculator
+    - web_search
+    - code_interpreter
