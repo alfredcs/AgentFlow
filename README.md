@@ -12,13 +12,13 @@ AgentFlow is a framework for building complex agentic workflows through structur
 
 - **Amazon Strands SDK**: Agent orchestration framework
 - **Amazon Bedrock**: Managed AI service with Claude models
-- **Claude Sonnet 4**: Primary reasoning model for complex tasks
+- **Claude Sonnet 4.5**: Primary reasoning model for complex tasks
 - **Claude Haiku 4.5**: Fast model for simple operations
 
 ## ✨ Key Features
 
 - **🔄 Structured Workflows**: Define multi-step agent workflows with clear reasoning patterns
-- **🎯 Smart Model Routing**: Automatic routing between Sonnet 4 (complex) and Haiku 4.5 (simple)
+- **🎯 Smart Model Routing**: Automatic routing between Sonnet 4.5 (complex) and Haiku 4.5 (simple)
 - **🛡️ Fault Tolerance**: Comprehensive error handling and retry mechanisms
 - **📊 Production Logging**: Structured logging with CloudWatch integration
 - **👁️ Observability**: Built-in metrics and execution tracing
@@ -189,7 +189,7 @@ See `config/example_config.yaml` for complete configuration options.
 
 - Python 3.10+
 - AWS Account with Bedrock access
-- Claude Sonnet 4 and Haiku 4.5 model access enabled
+- Claude Sonnet 4.5 and Haiku 4.5 model access enabled
 - AWS CLI configured
 
 ### Setup Development Environment
