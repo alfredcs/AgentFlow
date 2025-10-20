@@ -24,8 +24,8 @@ logger = setup_logger(__name__)
 
 class ModelType(Enum):
     """Supported Bedrock model types"""
-    SONNET_4_5 = "anthropic.claude-sonnet-4-5-20250929-v1:0"
-    HAIKU_4_5 = "anthropic.claude-haiku-4-5-20251001-v1:0"
+    SONNET_4_5 = "us.anthropic.claude-sonnet-4-5-20250929-v1:0"
+    HAIKU_4_5 = "us.anthropic.claude-haiku-4-5-20251001-v1:0"
 
 
 class BedrockClient:

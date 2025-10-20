@@ -1,6 +1,33 @@
-# AgentFlow - Amazon Strands Implementation
+Metadata-Version: 2.4
+Name: agentflow-strands
+Version: 0.1.0
+Summary: AgentFlow implementation using Amazon Strands SDK and Bedrock
+Author: AgentFlow Team
+License: MIT
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: strands-agents>=0.1.0
+Requires-Dist: boto3>=1.34.0
+Requires-Dist: pydantic>=2.5.0
+Requires-Dist: structlog>=24.1.0
+Requires-Dist: tenacity>=8.2.3
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4.3; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21.1; extra == "dev"
+Requires-Dist: pytest-cov>=4.1.0; extra == "dev"
+Requires-Dist: black>=23.12.0; extra == "dev"
+Requires-Dist: ruff>=0.1.8; extra == "dev"
+Requires-Dist: mypy>=1.7.1; extra == "dev"
+Dynamic: license-file
 
-AgentFlow introduces a trainable agentic system that optimizes planning directly within multi-turn workflows, addressing a fundamental limitation in current tool-augmented LLMs.  This solution demonstrates that small, strategically trained agentic systems can outperform much larger monolithic models by learning effective planning through outcome-driven reinforcement learning in realistic multi-turn environments.
+# AgentFlow - Amazon Strands Implementation
 
 A production-ready implementation of AgentFlow using Amazon Strands SDK and Amazon Bedrock, enabling structured agentic workflows with Claude Sonnet 4.5 and Haiku 4.5.
 
@@ -27,28 +54,6 @@ AgentFlow is a framework for building complex agentic workflows through structur
 - **🔒 Type Safety**: Full type hints and validation
 - **⚡ Parallel Execution**: Run independent steps concurrently
 - **🧠 Reasoning Patterns**: Chain-of-Thought, ReAct, Tree-of-Thought, and more
-
-##  Novel Training Algorithm: Flow-GRPO
-The most significant technical contribution is Flow-based Group Refined Policy Optimization (Flow-GRPO):
-
-Problem it solves: Long-horizon credit assignment with sparse rewards in multi-turn agentic systems
-
-**How it works:**
-
-- Converts multi-turn RL into a sequence of single-turn policy updates
-- Broadcasts a single trajectory-level outcome reward to every turn in the reasoning chain
-- Uses group-normalized advantages to stabilize training
-- Mathematically proven equivalence: maximizing global multi-turn objective = maximizing expected token-level local objectives
-
-**Key insight:** Instead of trying to assign different rewards to different steps (brittle), give the same final outcome to all steps and let the model learn which actions contribute to success.
-
-##  🎉 Architectural Innovation: In-the-Flow Optimization
-- Unlike monolithic tool-integrated models that train a single policy for all actions, AgentFlow decomposes reasoning into 4 specialized modules:
-- Action Planner (trainable via RL)
-- Tool Executor (frozen)
-- Execution Verifier (frozen)
-- Solution Generator (frozen)
-- Modules coordinate through an evolving memory that provides structured, deterministic state tracking
 
 ## 🚀 Quick Start
 
