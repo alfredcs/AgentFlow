@@ -1,6 +1,6 @@
 # AgentFlow - Amazon Strands Implementation
 
-A production-ready implementation of AgentFlow using Amazon Strands SDK and Amazon Bedrock, enabling structured agentic workflows with Claude Sonnet 4 and Haiku 4.5.
+A production-ready implementation of AgentFlow using Amazon Strands SDK and Amazon Bedrock, enabling structured agentic workflows with Claude Sonnet 4.5 and Haiku 4.5.
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
