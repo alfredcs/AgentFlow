@@ -66,7 +66,7 @@ class Planner:
         
         Args:
             bedrock_client: BedrockClient instance for model invocations
-            model_type: Bedrock model to use (default: Sonnet 4)
+            model_type: Bedrock model to use (default: Sonnet 4.5)
             toolbox_metadata: Metadata about available tools
             available_tools: List of available tool names
             verbose: Enable verbose logging
@@ -272,35 +272,62 @@ Be brief and precise with insight.
                 if to_canonical(tool) == normalized_input:
                     return tool
             
+            # Check if it's a FINISH signal
+            if "finish" in tool_name.lower():
+                return "FINISH"
+            
             logger.warning(f"No matched tool for: {tool_name}")
-            return f"No matched tool given: {tool_name}"
+            return tool_name  # Return as-is instead of error message
         
         try:
             if isinstance(response, str):
                 # Parse text response
-                text = response.replace("**", "")
+                text = response.replace("**", "").strip()
                 
-                # Pattern to match the format
-                pattern = r"Context:\s*(.*?)Sub-Goal:\s*(.*?)Tool Name:\s*(.*?)\s*(?:```)?\\s*(?=\n\n|\Z)"
-                matches = re.findall(pattern, text, re.DOTALL)
+                # Try multiple patterns for robustness
+                patterns = [
+                    # Pattern 1: Standard format
+                    r"Context:\s*(.*?)Sub-Goal:\s*(.*?)Tool Name:\s*(.*?)(?:\n\n|\Z)",
+                    # Pattern 2: With optional markdown
+                    r"Context:\s*(.*?)Sub-Goal:\s*(.*?)Tool Name:\s*(.*?)\s*(?:```)?",
+                    # Pattern 3: Case insensitive
+                    r"context:\s*(.*?)sub-goal:\s*(.*?)tool name:\s*(.*?)(?:\n\n|\Z)",
+                    # Pattern 4: Alternative format
+                    r"\*\*Context\*\*:\s*(.*?)\*\*Sub-Goal\*\*:\s*(.*?)\*\*Tool Name\*\*:\s*(.*?)(?:\n\n|\Z)",
+                ]
                 
-                if matches:
-                    context, sub_goal, tool_name = matches[-1]
-                    context = context.strip()
-                    sub_goal = sub_goal.strip()
-                    tool_name = normalize_tool_name(tool_name.strip())
-                    
-                    logger.debug(
-                        "Extracted planning components",
-                        context_length=len(context),
-                        sub_goal_length=len(sub_goal),
-                        tool_name=tool_name
-                    )
-                    
-                    return context, sub_goal, tool_name
-                else:
-                    logger.warning("No matches found in response")
-                    return None, None, None
+                for pattern in patterns:
+                    matches = re.findall(pattern, text, re.DOTALL | re.IGNORECASE)
+                    if matches:
+                        context, sub_goal, tool_name = matches[-1]
+                        context = context.strip()
+                        sub_goal = sub_goal.strip()
+                        tool_name = normalize_tool_name(tool_name.strip())
+                        
+                        logger.debug(
+                            "Extracted planning components",
+                            context_length=len(context),
+                            sub_goal_length=len(sub_goal),
+                            tool_name=tool_name,
+                            pattern_used=pattern[:50]
+                        )
+                        
+                        return context, sub_goal, tool_name
+                
+                # If no pattern matched, log the response for debugging
+                logger.warning(
+                    "No matches found in response",
+                    response_preview=text[:300]
+                )
+                
+                # Try to extract tool name at least
+                tool_match = re.search(r"tool[:\s]+([a-zA-Z_]+)", text, re.IGNORECASE)
+                if tool_match:
+                    tool_name = normalize_tool_name(tool_match.group(1))
+                    logger.info(f"Extracted tool name only: {tool_name}")
+                    return "Context not found", "Sub-goal not found", tool_name
+                
+                return None, None, None
             else:
                 logger.warning(f"Unexpected response type: {type(response)}")
                 return None, None, None
@@ -544,3 +571,4 @@ class SyncPlanner(Planner):
     ) -> bool:
         """Synchronous version of verify_memory"""
         return asyncio.run(self.verify_memory(question, memory, final_answer))
+

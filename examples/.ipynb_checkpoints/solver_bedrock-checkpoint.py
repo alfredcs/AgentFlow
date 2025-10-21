@@ -203,17 +203,46 @@ class Solver:
                 
                 context, sub_goal, tool_name = self.planner.extract_context_subgoal_and_tool(next_step)
                 
+                # Log extraction results for debugging
+                logger.debug(
+                    "Extracted step components",
+                    context_found=context is not None,
+                    sub_goal_found=sub_goal is not None,
+                    tool_name_found=tool_name is not None,
+                    tool_name=tool_name
+                )
+                
                 if self.verbose:
                     print(f"\n==> 🎯 Step {step_count}: Action Prediction ({tool_name})\n")
                     print(f"[Context]: {context}\n[Sub Goal]: {sub_goal}\n[Tool]: {tool_name}")
                     print(f"[Time]: {round(time.time() - local_start_time, 2)}s")
+                
+                # Check if extraction failed
+                if context is None or sub_goal is None or tool_name is None:
+                    logger.warning(
+                        "Failed to extract step components from response",
+                        next_step_preview=next_step[:200] if isinstance(next_step, str) else str(next_step)[:200]
+                    )
+                    print(f"\n==> ⚠️ Warning: Could not parse next step response")
+                    print(f"Response preview: {next_step[:200] if isinstance(next_step, str) else str(next_step)[:200]}")
+                    
+                    # Try to continue with a default action or break
+                    if step_count >= 2:  # If we've made some progress, stop gracefully
+                        logger.info("Stopping execution due to parsing failure after progress")
+                        break
+                    else:
+                        # For first step, try to generate a direct answer
+                        logger.info("Attempting direct answer generation")
+                        tool_name = "FINISH"
+                        context = "Unable to parse planning response"
+                        sub_goal = "Generate direct answer"
                 
                 # Check if we should finish
                 if tool_name and "FINISH" in tool_name.upper():
                     logger.info("Received FINISH signal, stopping execution")
                     break
                 
-                if tool_name is None or tool_name not in self.planner.available_tools:
+                if tool_name not in self.planner.available_tools:
                     logger.warning(f"Tool '{tool_name}' not available")
                     print(f"\n==> 🚫 Error: Tool '{tool_name}' is not available or not found.")
                     command = "No command was generated because the tool was not found."
@@ -512,6 +541,11 @@ def parse_arguments():
         default="us-east-1",
         help="AWS region name"
     )
+    parser.add_argument(
+        "--prompt",
+        default="What were the cpatials of China since the Qin dynasty?",
+        help="Your question"
+    )
     
     return parser.parse_args()
 
@@ -539,7 +573,7 @@ async def main_async(args):
     )
     
     # Solve the task
-    result = await solver.solve("What is the capital of France?")
+    result = await solver.solve(args.prompt)
     
     # Save result
     output_file = f"{args.root_cache_dir}/result.json"
@@ -557,3 +591,4 @@ def main(args):
 if __name__ == "__main__":
     args = parse_arguments()
     main(args)
+

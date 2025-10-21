@@ -91,7 +91,7 @@ class Executor:
         
         Args:
             bedrock_client: BedrockClient instance for model invocations
-            model_type: Bedrock model to use (default: Sonnet 4.5)
+            model_type: Bedrock model to use (default: Sonnet 4)
             root_cache_dir: Root directory for caching
             num_threads: Number of threads for execution
             max_time: Maximum execution time in seconds
@@ -439,15 +439,6 @@ execution = tool.execute(query=["Methanol", "function of hyperbola", "Fermat's L
             # Return all the execution results
             return executions
             
-        except ImportError as e:
-            # Tool module not found - fall back to simulation
-            logger.warning(
-                f"Tool module not found, using simulation",
-                tool_name=tool_name,
-                module_name=module_name
-            )
-            return self._simulate_tool_execution(tool_name, command)
-            
         except Exception as e:
             error_msg = f"Error in execute_tool_command: {str(e)}"
             logger.error(
@@ -457,63 +448,6 @@ execution = tool.execute(query=["Methanol", "function of hyperbola", "Fermat's L
                 exc_info=True
             )
             return error_msg
-    
-    def _simulate_tool_execution(self, tool_name: str, command: str) -> Any:
-        """
-        Simulate tool execution for demonstration purposes
-        
-        In a real implementation, this would be replaced with actual tool imports
-        and execution logic.
-        """
-        logger.info(f"Simulating execution for tool: {tool_name}")
-        
-        # Extract the query/input from the command
-        # Try to extract parameters from tool.execute() call
-        execute_pattern = r'tool\.execute\(([^)]+)\)'
-        match = re.search(execute_pattern, command)
-        
-        if match:
-            params_str = match.group(1)
-            logger.debug(f"Extracted parameters: {params_str}")
-        else:
-            params_str = "No parameters found"
-        
-        # Simulate different tool behaviors
-        if "calculator" in tool_name.lower():
-            # Simulate calculator
-            if "15% of 250" in command or "0.15 * 250" in command:
-                return ["37.5"]
-            elif "compound interest" in command.lower():
-                return ["$11,576.25"]
-            else:
-                return ["Calculation result: 42"]
-        
-        elif "search" in tool_name.lower() or "web" in tool_name.lower():
-            # Simulate web search
-            return [{
-                "results": [
-                    "Search result 1: Relevant information found",
-                    "Search result 2: Additional context",
-                    "Search result 3: Supporting data"
-                ],
-                "summary": "Found relevant information from web search"
-            }]
-        
-        elif "code" in tool_name.lower() or "python" in tool_name.lower():
-            # Simulate code execution
-            return [{
-                "output": "Code executed successfully",
-                "result": "Expected output generated",
-                "status": "completed"
-            }]
-        
-        elif "generator" in tool_name.lower() or "base" in tool_name.lower():
-            # Simulate general solution generator
-            return ["Generated solution based on the given parameters and context."]
-        
-        else:
-            # Generic simulation
-            return [f"Simulated result from {tool_name} with parameters: {params_str}"]
 
 
 # Synchronous wrapper for backward compatibility
