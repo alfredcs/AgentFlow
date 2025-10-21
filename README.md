@@ -140,6 +140,9 @@ agentflow/
 │   ├── parallel_workflow.py
 │   ├── reasoning_workflow.py
 │   └── tool_agent_workflow.py
+│   ├── planner_workflow.py
+│   ├── rexecutor_workflow.py
+│   └── solver_bedrock.py
 ├── tests/                  # Comprehensive test suite
 ├── docs/                   # Complete documentation
 │   ├── getting_started.md
@@ -169,6 +172,9 @@ Explore working examples in the `examples/` directory:
 - **parallel_workflow.py**: Parallel execution with multiple agents
 - **reasoning_workflow.py**: Different reasoning patterns (CoT, ReAct, etc.)
 - **tool_agent_workflow.py**: Agents with tool-calling capabilities
+- **planner_workflow.py**: Query analysis, multi-step planning, Memory management, result verification
+- **executor_workflow.py**: Tool command generation, command parsing, ool execution with timeout protection
+- **solver_bedrock.py**: Orchestrates the complete workflow:1. Query analysis 2. Multi-step planning and execution 3. Memory management 4. Result generation
 
 Run any example:
 ```bash
