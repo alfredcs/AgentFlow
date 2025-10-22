@@ -1,0 +1,38 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"],
+      "disabled": false,
+      "autoApprove": ["read_file", "list_directory"]
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": {
+        "BRAVE_API_KEY": "your-api-key-here"
+      },
+      "disabled": true,
+      "autoApprove": []
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "your-token-here"
+      },
+      "disabled": true,
+      "autoApprove": ["search_repositories"]
+    },
+    "aws-kb-retrieval": {
+      "command": "uvx",
+      "args": ["mcp-server-aws-kb-retrieval"],
+      "env": {
+        "AWS_REGION": "us-east-1",
+        "KB_ID": "your-knowledge-base-id"
+      },
+      "disabled": true,
+      "autoApprove": []
+    }
+  }
+}

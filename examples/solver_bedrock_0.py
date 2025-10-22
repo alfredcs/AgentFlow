@@ -393,10 +393,7 @@ def construct_solver(
     root_cache_dir: str = "solver_cache",
     verbose: bool = True,
     temperature: float = 0.0,
-    region_name: str = "us-east-1",
-    enable_mcp: bool = True,
-    mcp_config_path: Optional[str] = None,
-    mcp_servers: Optional[List[str]] = None
+    region_name: str = "us-east-1"
 ) -> Solver:
     """
     Construct a Solver instance with BedrockClient
@@ -414,9 +411,6 @@ def construct_solver(
         verbose: Enable verbose output
         temperature: Sampling temperature
         region_name: AWS region name
-        enable_mcp: Enable MCP tool loading
-        mcp_config_path: Custom MCP config path
-        mcp_servers: List of MCP servers to load (None = all)
         
     Returns:
         Configured Solver instance
@@ -464,24 +458,8 @@ def construct_solver(
         model_type=model_type,
         root_cache_dir=root_cache_dir,
         verbose=verbose,
-        temperature=temperature,
-        enable_mcp=enable_mcp,
-        mcp_config_path=mcp_config_path
+        temperature=temperature
     )
-    
-    # Load MCP tools if enabled
-    if enable_mcp:
-        try:
-            asyncio.run(executor.load_mcp_tools(mcp_servers))
-            
-            # Merge MCP tool metadata with existing toolbox
-            mcp_metadata = executor.get_mcp_tool_metadata()
-            if mcp_metadata:
-                toolbox_metadata.update(mcp_metadata)
-                enabled_tools.extend(list(mcp_metadata.keys()))
-                logger.info(f"Added {len(mcp_metadata)} MCP tools to toolbox")
-        except Exception as e:
-            logger.warning(f"Failed to load MCP tools: {e}")
     
     # Instantiate Solver
     solver = Solver(
@@ -613,3 +591,4 @@ def main(args):
 if __name__ == "__main__":
     args = parse_arguments()
     main(args)
+

@@ -180,6 +180,10 @@ Run any example:
 ```bash
 python examples/basic_workflow.py
 ```
+Run a complete agentic workflow:
+```bash
+python examples/solver_bedrock.py --prompt "<your question>"
+```
 
 ## 🧪 Testing
 

@@ -19,6 +19,14 @@ from agentflow.utils.logging import setup_logger
 
 logger = setup_logger(__name__)
 
+# Import MCP support (optional)
+try:
+    from agentflow.mcp import MCPToolLoader, MCPConfig
+    MCP_AVAILABLE = True
+except ImportError:
+    MCP_AVAILABLE = False
+    logger.warning("MCP support not available")
+
 
 # Tool name mapping: Static fallback mapping (long external names to internal)
 TOOL_NAME_MAPPING_LONG = {
@@ -84,7 +92,9 @@ class Executor:
         max_time: int = 120,
         max_output_length: int = 100000,
         verbose: bool = False,
-        temperature: float = 0.0
+        temperature: float = 0.0,
+        enable_mcp: bool = True,
+        mcp_config_path: Optional[str] = None
     ):
         """
         Initialize executor with BedrockClient
@@ -98,6 +108,8 @@ class Executor:
             max_output_length: Maximum output length
             verbose: Enable verbose logging
             temperature: Sampling temperature
+            enable_mcp: Enable MCP tool loading
+            mcp_config_path: Custom MCP config path
         """
         self.bedrock_client = bedrock_client
         self.model_type = model_type
@@ -109,13 +121,26 @@ class Executor:
         self.temperature = temperature
         self.query_cache_dir: Optional[str] = None
         
+        # MCP tool support
+        self.mcp_loader: Optional[Any] = None
+        self.mcp_tools: Dict[str, Any] = {}
+        
+        if enable_mcp and MCP_AVAILABLE:
+            try:
+                mcp_config = MCPConfig(config_path=mcp_config_path)
+                self.mcp_loader = MCPToolLoader(mcp_config)
+                logger.info("MCP tool support enabled")
+            except Exception as e:
+                logger.warning(f"Failed to initialize MCP support: {e}")
+        
         # CloudWatch logging
         logger.info(
             "Executor initialized",
             model_type=model_type.value,
             max_time=max_time,
             temperature=temperature,
-            root_cache_dir=root_cache_dir
+            root_cache_dir=root_cache_dir,
+            mcp_enabled=self.mcp_loader is not None
         )
     
     def set_query_cache_dir(self, query_cache_dir: Optional[str] = None) -> None:
@@ -137,6 +162,29 @@ class Executor:
             "Query cache directory set",
             cache_dir=self.query_cache_dir
         )
+    
+    async def load_mcp_tools(self, server_names: Optional[List[str]] = None) -> None:
+        """
+        Load tools from MCP servers
+        
+        Args:
+            server_names: List of server names to load (None = all)
+        """
+        if not self.mcp_loader:
+            logger.warning("MCP loader not initialized")
+            return
+        
+        try:
+            self.mcp_tools = await self.mcp_loader.load_tools(server_names)
+            logger.info(f"Loaded {len(self.mcp_tools)} MCP tools")
+        except Exception as e:
+            logger.error(f"Failed to load MCP tools: {e}", exc_info=True)
+    
+    def get_mcp_tool_metadata(self) -> Dict[str, Dict[str, Any]]:
+        """Get metadata for all MCP tools"""
+        if not self.mcp_loader:
+            return {}
+        return self.mcp_loader.get_tool_metadata()
     
     async def generate_tool_command(
         self,
@@ -370,6 +418,11 @@ execution = tool.execute(query=["Methanol", "function of hyperbola", "Fermat's L
             command_length=len(command)
         )
         
+        # Check if this is an MCP tool
+        if self.mcp_loader and tool_name in self.mcp_tools:
+            logger.info(f"Executing MCP tool: {tool_name}")
+            return asyncio.run(self._execute_mcp_tool(tool_name, command))
+        
         # Resolve tool name mapping
         if tool_name in TOOL_NAME_MAPPING_LONG:
             dir_name = TOOL_NAME_MAPPING_LONG[tool_name]["dir_name"]
@@ -456,6 +509,59 @@ execution = tool.execute(query=["Methanol", "function of hyperbola", "Fermat's L
                 module_name=module_name,
                 exc_info=True
             )
+            return error_msg
+    
+    async def _execute_mcp_tool(self, tool_name: str, command: str) -> Any:
+        """
+        Execute an MCP tool
+        
+        Args:
+            tool_name: MCP tool name (e.g., "filesystem.read_file")
+            command: Command string with tool.execute() call
+            
+        Returns:
+            Tool execution result
+        """
+        try:
+            # Extract parameters from command
+            # Pattern: tool.execute(param1=value1, param2=value2)
+            import ast
+            
+            # Find the execute call
+            execute_pattern = r'tool\.execute\(([^)]+)\)'
+            match = re.search(execute_pattern, command)
+            
+            if not match:
+                return "Error: Could not parse MCP tool parameters"
+            
+            params_str = match.group(1)
+            
+            # Parse parameters
+            # This is a simplified parser - in production use ast.parse
+            params = {}
+            try:
+                # Try to evaluate as dict-like parameters
+                params_code = f"dict({params_str})"
+                params = eval(params_code, {"__builtins__": {}}, {})
+            except:
+                # Fallback: try to parse as keyword arguments
+                for param in params_str.split(','):
+                    if '=' in param:
+                        key, value = param.split('=', 1)
+                        key = key.strip()
+                        value = value.strip().strip('"\'')
+                        params[key] = value
+            
+            logger.info(f"Executing MCP tool {tool_name} with params: {params}")
+            
+            # Execute the MCP tool
+            result = await self.mcp_loader.execute_tool(tool_name, **params)
+            
+            return [result]  # Return as list for consistency
+            
+        except Exception as e:
+            error_msg = f"Error executing MCP tool {tool_name}: {str(e)}"
+            logger.error(error_msg, exc_info=True)
             return error_msg
     
     def _simulate_tool_execution(self, tool_name: str, command: str) -> Any:
