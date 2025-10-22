@@ -1,4 +1,4 @@
-# AgentFlow - Amazon Strands Implementation
+# AgentFlow - implementation of multi-trun agentic workflow with Bedrock and MCP
 
 AgentFlow introduces a trainable agentic system that optimizes planning directly within multi-turn workflows, addressing a fundamental limitation in current tool-augmented LLMs.  This solution demonstrates that small, strategically trained agentic systems can outperform much larger monolithic models by learning effective planning through outcome-driven reinforcement learning in realistic multi-turn environments.
 
@@ -14,6 +14,7 @@ AgentFlow is a framework for building complex agentic workflows through structur
 
 - **Amazon Strands SDK**: Agent orchestration framework
 - **Amazon Bedrock**: Managed AI service with Claude models
+- **MCP**: Enable agents access tools via MCP protocol
 - **Claude Sonnet 4.5**: Primary reasoning model for complex tasks
 - **Claude Haiku 4.5**: Fast model for simple operations
 

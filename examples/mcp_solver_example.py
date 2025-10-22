@@ -6,7 +6,7 @@ Demonstrates how to integrate external tools via Model Context Protocol (MCP).
 
 import asyncio
 import os
-from agentflow.solver import construct_solver
+from solver_bedrock import construct_solver
 from agentflow.models.bedrock_client import ModelType
 
 
@@ -23,7 +23,7 @@ async def main():
     print("-" * 50)
     
     solver = construct_solver(
-        model_type=ModelType.SONNET_4,
+        model_type=ModelType.SONNET_4_5,
         enabled_tools=["calculator"],  # Built-in tools
         output_types="direct",
         max_steps=5,
@@ -58,7 +58,7 @@ async def main():
     custom_config_path = "examples/mcp_config_example.json"
     
     solver2 = construct_solver(
-        model_type=ModelType.SONNET_4,
+        model_type=ModelType.SONNET_4_5,
         enabled_tools=["web_search"],
         output_types="final,direct",
         max_steps=3,
@@ -122,7 +122,7 @@ async def main():
     print("-" * 50)
     
     solver4 = construct_solver(
-        model_type=ModelType.SONNET_4,
+        model_type=ModelType.SONNET_4_5,
         enabled_tools=["calculator"],
         output_types="direct",
         enable_mcp=False,  # Disable MCP
