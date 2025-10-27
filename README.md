@@ -55,7 +55,7 @@ Theoretical Improvements Over GRPO
 - 2. **Model Support**: Tested with Qwen-7B; other models may need adaptation 
 - 3. **Hardware**: Designed for multi-GPU training; single-GPU support limited
 - 4. **Dependencies**: Requires verl framework (external dependency)
-  5. 
+     
 **Key insight:** Instead of trying to assign different rewards to different steps (brittle), give the same final outcome to all steps and let the model learn which actions contribute to success.
 
 ##  🎉 Architectural Innovation: In-the-Flow Optimization
