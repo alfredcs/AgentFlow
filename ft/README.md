@@ -54,7 +54,7 @@ GVPO (Group Variance Policy Optimization) is an improvement over GRPO that offer
 
 ```bash
 # 1. Clone the repository (if not already done)
-git clone https://github.com/lupantech/AgentFlow.git
+git clone https://github.com/alfredcd/AgentFlow.git
 cd AgentFlow
 
 # 2. Install base AgentFlow dependencies
@@ -415,13 +415,13 @@ python ft/train_gvpo.py --dry-run
    - Comparison: [gvpo_vs_grpo.pdf](https://github.com/alfredcs/Reasoning-through-incentives/blob/main/gvpo_vs_grpo.pdf)
 
 2. **AgentFlow Paper**: (Original AgentFlow paper)
-   - GitHub: https://github.com/lupantech/AgentFlow
+   - GitHub: https://github.com/alfredcs/AgentFlow
 
 ### Code References
 
 - **verl Framework**: https://github.com/volcengine/verl
 - **GVPO Reference Implementation**: https://github.com/alfredcs/Reasoning-through-incentives/tree/main/src
-- **AgentFlow Training**: https://github.com/lupantech/AgentFlow/tree/main/train
+- **AgentFlow Training**: https://github.com/alfredcs/AgentFlow/tree/main/ft
 
 ## License
 
@@ -440,7 +440,7 @@ Contributions are welcome! Please:
 
 For issues and questions:
 
-- **AgentFlow Issues**: https://github.com/lupantech/AgentFlow/issues
+- **AgentFlow Issues**: https://github.com/alfredcs/AgentFlow/docs
 - **GVPO Issues**: https://github.com/alfredcs/Reasoning-through-incentives/issues
 
 ## Acknowledgments
