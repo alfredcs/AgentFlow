@@ -33,14 +33,14 @@ AgentFlow is a framework for building complex agentic workflows through structur
 ##  🥳 Novel Training Algorithm: Flow-GVPO
 This project implements **Group Variance Policy Optimization (GVPO)** as a replacement for GRPO in the AgentFlow training pipeline. GVPO offers superior theoretical guarantees and empirical performance, particularly on complex reasoning tasks.    
 
-Theoretical Improvements Over GRPO                                                                                                                                               │
-                                                                                                                                                                                        │
-| Feature | GRPO | GVPO |                                                                                                                                                               │
-|---------|------|------|                                                                                                                                                               │
-| Convergence | No proof | Proven optimal |                                                                                                                                             │
-| KL Handling | External penalty | Analytical integration |                                                                                                                             │
-| Stability | Importance sampling issues | More stable |                                                                                                                                │
-| Performance | Baseline | +40% on AIME 2024 |  
+Theoretical Improvements Over GRPO 
+ 
+| Feature | GRPO | GVPO | 
+|---------|------|------| 
+| Convergence | No proof | Proven optimal |
+| KL Handling | External penalty | Analytical integration |
+| Stability | Importance sampling issues | More stable |
+| Performance | Baseline | +40% on AIME 2024 |
 
 **How it works:**
 
@@ -49,13 +49,13 @@ Theoretical Improvements Over GRPO                                              
 - Uses group-normalized advantages to stabilize training
 - Mathematically proven equivalence: maximizing global multi-turn objective = maximizing expected token-level local objectives
 
-**Known Limitations:**                                                                                                                                                                    │
-                                                                                                                                                                                       │
-- 1. **Data Format**: Requires Parquet files with specific columns (question, answer, data_id)                                                                                            │
-- 2. **Model Support**: Tested with Qwen-7B; other models may need adaptation                                                                                                             │
-- 3. **Hardware**: Designed for multi-GPU training; single-GPU support limited                                                                                                            │
-- 4. **Dependencies**: Requires verl framework (external dependency)   
-
+**Known Limitations:**                                                                                                                                                                   
+                                                                                                                                                                                    
+- 1. **Data Format**: Requires Parquet files with specific columns (question, answer, data_id) 
+- 2. **Model Support**: Tested with Qwen-7B; other models may need adaptation 
+- 3. **Hardware**: Designed for multi-GPU training; single-GPU support limited
+- 4. **Dependencies**: Requires verl framework (external dependency)
+  5. 
 **Key insight:** Instead of trying to assign different rewards to different steps (brittle), give the same final outcome to all steps and let the model learn which actions contribute to success.
 
 ##  🎉 Architectural Innovation: In-the-Flow Optimization
