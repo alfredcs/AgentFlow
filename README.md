@@ -19,6 +19,7 @@ AgentFlow is a framework for building complex agentic workflows through structur
 - **Claude Haiku 4.5**: Fast model for simple operations
 
 ## ✨ Key Features
+        
 
 - **🔄 Structured Workflows**: Define multi-step agent workflows with clear reasoning patterns
 - **🎯 Smart Model Routing**: Automatic routing between Sonnet 4.5 (complex) and Haiku 4.5 (simple)
@@ -29,10 +30,17 @@ AgentFlow is a framework for building complex agentic workflows through structur
 - **⚡ Parallel Execution**: Run independent steps concurrently
 - **🧠 Reasoning Patterns**: Chain-of-Thought, ReAct, Tree-of-Thought, and more
 
-##  🥳 Novel Training Algorithm: Flow-GRPO
-The most significant technical contribution is Flow-based Group Refined Policy Optimization (Flow-GRPO):
+##  🥳 Novel Training Algorithm: Flow-GVPO
+This project implements **Group Variance Policy Optimization (GVPO)** as a replacement for GRPO in the AgentFlow training pipeline. GVPO offers superior theoretical guarantees and empirical performance, particularly on complex reasoning tasks.    
 
-Problem it solves: Long-horizon credit assignment with sparse rewards in multi-turn agentic systems
+Theoretical Improvements Over GRPO                                                                                                                                               │
+                                                                                                                                                                                        │
+| Feature | GRPO | GVPO |                                                                                                                                                               │
+|---------|------|------|                                                                                                                                                               │
+| Convergence | No proof | Proven optimal |                                                                                                                                             │
+| KL Handling | External penalty | Analytical integration |                                                                                                                             │
+| Stability | Importance sampling issues | More stable |                                                                                                                                │
+| Performance | Baseline | +40% on AIME 2024 |  
 
 **How it works:**
 
@@ -40,6 +48,13 @@ Problem it solves: Long-horizon credit assignment with sparse rewards in multi-t
 - Broadcasts a single trajectory-level outcome reward to every turn in the reasoning chain
 - Uses group-normalized advantages to stabilize training
 - Mathematically proven equivalence: maximizing global multi-turn objective = maximizing expected token-level local objectives
+
+**Known Limitations:**                                                                                                                                                                    │
+                                                                                                                                                                                       │
+- 1. **Data Format**: Requires Parquet files with specific columns (question, answer, data_id)                                                                                            │
+- 2. **Model Support**: Tested with Qwen-7B; other models may need adaptation                                                                                                             │
+- 3. **Hardware**: Designed for multi-GPU training; single-GPU support limited                                                                                                            │
+- 4. **Dependencies**: Requires verl framework (external dependency)   
 
 **Key insight:** Instead of trying to assign different rewards to different steps (brittle), give the same final outcome to all steps and let the model learn which actions contribute to success.
 

@@ -1,0 +1,51 @@
+# GVPO Training Requirements for AgentFlow
+# These are additional requirements on top of base AgentFlow dependencies
+
+# Core Dependencies
+torch>=2.0.0
+transformers>=4.35.0
+accelerate>=0.24.0
+peft>=0.6.0
+
+# Distributed Training
+deepspeed>=0.12.0
+ray>=2.8.0
+
+# verl Framework (for RL training infrastructure)
+# Install from: https://github.com/volcengine/verl
+# pip install git+https://github.com/volcengine/verl.git
+
+# Configuration & Logging
+pyyaml>=6.0
+omegaconf>=2.3.0
+wandb>=0.15.0
+codetiming>=1.4.0
+tqdm>=4.66.0
+
+# Data Processing
+pandas>=2.0.0
+pyarrow>=13.0.0
+datasets>=2.14.0
+
+# Model Serving
+vllm>=0.2.0
+openai>=1.0.0
+
+# Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+
+# Utilities
+pydantic>=2.0.0
+numpy>=1.24.0
+scipy>=1.11.0
+
+# Optional: for better performance
+flash-attn>=2.0.0  # Requires CUDA, install separately if needed
+xformers>=0.0.22  # Requires CUDA, install separately if needed
+
+# Development Tools (optional)
+black>=23.0.0
+flake8>=6.1.0
+mypy>=1.5.0
+isort>=5.12.0

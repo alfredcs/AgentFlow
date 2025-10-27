@@ -1,0 +1,191 @@
+# GVPO Training Configuration for AgentFlow
+# This configuration uses Group Variance Policy Optimization (GVPO) instead of GRPO
+# for improved theoretical guarantees and empirical performance.
+
+# Environment Variables
+env:
+  OPENAI_API_KEY: "YOUR_OPENAI_API"  # Optional, for reward computation tools
+  CUDA_VISIBLE_DEVICES: '0,1,2,3,4,5,6,7'  # GPUs to use
+  HYDRA_FULL_ERROR: 1
+  N_GPUS: 8
+  BASE_MODEL: 'Qwen/Qwen2.5-7B-Instruct'  # Base model for training
+  ROLLOUT_TP_SIZE: 1  # Tensor parallel size for rollout
+  EXPERIMENT_NAME: 'gvpo_agentflow_7B'  # Experiment name for tracking
+  PROJECT_NAME: 'AgentFlow_GVPO'  # Project name for wandb/tracking
+  BASE_DATA_DIR: 'data'  # Data directory
+  VERBOSITY: 'DEBUG'
+  N_WORKERS: 16  # Number of parallel workers
+
+  # Tool Configuration
+  ENABLE_TOOLS: ["Base_Generator_Tool","Python_Coder_Tool","Google_Search_Tool","Wikipedia_Search_Tool"]
+  TOOL_ENGINE: ["dashscope","dashscope","Default","Default"]
+  TOOL_STEPS: 3
+
+  # Temperature Settings
+  TEST_TEMPERATURE: 0.0  # Greedy for evaluation
+  TRAIN_TEMPERATURE: 0.7  # Sampling temperature for training
+
+  # Output Settings
+  OUTPUT_TYPE: "direct"
+  AGENT_MAX_TIMEOUT: 500
+
+# Python Arguments for Training
+python_args:
+  # Server Configuration
+  agentflow.port: 9999
+
+  # ============================================================
+  # GVPO Algorithm Configuration
+  # ============================================================
+  algorithm.adv_estimator: 'gvpo'  # Use GVPO instead of GRPO
+
+  # GVPO-specific parameters
+  algorithm.gvpo_beta: 0.1  # KL penalty coefficient (0.05-0.15 recommended)
+  algorithm.gvpo_use_bessel_correction: True  # Use (k-1) for unbiased estimation
+  algorithm.gvpo_clip_weight: null  # Optional: clip weights for stability (e.g., 5.0)
+  algorithm.gvpo_normalize_weights: True  # Ensure zero-sum constraint
+
+  # General algorithm parameters
+  algorithm.gamma: 1.0  # Discount factor
+  algorithm.lam: 0.95  # GAE lambda (if using critic)
+  algorithm.use_kl_in_reward: False  # Don't use KL in reward (GVPO handles it)
+  algorithm.kl_penalty: 'kl'
+
+  # ============================================================
+  # Data Configuration
+  # ============================================================
+  data.train_files: '${BASE_DATA_DIR}/train/combined_train.parquet'
+  data.val_files: '${BASE_DATA_DIR}/val/aime24.parquet'
+  data.train_batch_size: 32
+  data.max_prompt_length: 18432
+  data.max_response_length: 2048
+  data.truncation: 'truncate'  # or 'error' to fail on overflow
+
+  # ============================================================
+  # Model Configuration
+  # ============================================================
+  actor_rollout_ref.model.path: '${BASE_MODEL}'
+  actor_rollout_ref.model.use_remove_padding: True
+  actor_rollout_ref.model.enable_gradient_checkpointing: True
+
+  # ============================================================
+  # Rollout Configuration
+  # ============================================================
+  actor_rollout_ref.rollout.name: 'vllm'
+  actor_rollout_ref.rollout.n: 8  # Number of samples per prompt (k in paper)
+  actor_rollout_ref.rollout.tensor_model_parallel_size: '${ROLLOUT_TP_SIZE}'
+  actor_rollout_ref.rollout.gpu_memory_utilization: 0.6
+  actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu: 4
+  actor_rollout_ref.rollout.multi_turn.format: 'hermes'
+
+  # ============================================================
+  # Actor (Policy) Configuration
+  # ============================================================
+  actor_rollout_ref.actor.ppo_mini_batch_size: 8
+  actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu: 4
+  actor_rollout_ref.actor.optim.lr: 1e-6  # Learning rate
+
+  # KL divergence handling (GVPO integrates KL analytically)
+  actor_rollout_ref.actor.use_kl_loss: True
+  actor_rollout_ref.actor.kl_loss_coef: 0.001
+
+  # Entropy bonus (optional, for exploration)
+  actor_rollout_ref.actor.entropy_coeff: 0.0
+
+  # PPO clipping (for policy update stability)
+  actor_rollout_ref.actor.clip_ratio_low: 0.2
+  actor_rollout_ref.actor.clip_ratio_high: 0.3
+
+  # FSDP Configuration (for distributed training)
+  actor_rollout_ref.actor.fsdp_config.param_offload: False
+  actor_rollout_ref.actor.fsdp_config.optimizer_offload: False
+
+  # ============================================================
+  # Reference Policy Configuration
+  # ============================================================
+  actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu: 4
+  actor_rollout_ref.ref.fsdp_config.param_offload: False
+
+  # ============================================================
+  # Trainer Configuration
+  # ============================================================
+  trainer.n_gpus_per_node: '${N_GPUS}'
+  trainer.nnodes: 1
+  trainer.total_epochs: 5
+  trainer.save_freq: 2  # Save checkpoint every N epochs
+  trainer.test_freq: 2  # Evaluate every N epochs
+  trainer.val_before_train: True  # Run validation before training
+  trainer.critic_warmup: 0  # No critic warmup (unless using value function)
+  trainer.balance_batch: True  # Balance tokens across GPUs
+
+  # Logging Configuration
+  trainer.logger: ['console','wandb']  # Use console and wandb
+  trainer.project_name: '${PROJECT_NAME}'
+  trainer.experiment_name: '${EXPERIMENT_NAME}'
+
+  # ============================================================
+  # AgentFlow-specific Configuration
+  # ============================================================
+  agentflow.enable_rollout_validation: True
+  agentflow.max_empty_retries: 2
+
+# ============================================================
+# Configuration Notes
+# ============================================================
+#
+# GVPO vs GRPO:
+#
+# 1. Advantage Computation:
+#    - GRPO: (R - R̄) / σ_R  (normalizes by standard deviation)
+#    - GVPO: (R - R̄) - β(log_ratio - log_ratio_̄)  (centers without normalization)
+#
+# 2. KL Divergence:
+#    - GRPO: Applied externally via hyperparameters
+#    - GVPO: Integrated analytically into gradient weights
+#
+# 3. Theoretical Guarantees:
+#    - GRPO: No convergence proof
+#    - GVPO: Provably converges to KL-constrained optimal policy
+#
+# 4. Key Parameters:
+#    - gvpo_beta: Controls KL penalty (0.05-0.15 typically works well)
+#      * Lower beta → more reward optimization, less constraint
+#      * Higher beta → stronger KL constraint, more conservative
+#    - rollout.n: Number of samples per prompt (k in paper)
+#      * GVPO scales better with larger k (8-16 recommended)
+#      * Performance improves with more samples
+#
+# 5. Recommended Settings:
+#    - For math reasoning: beta=0.1, n=8-16
+#    - For general QA: beta=0.05-0.08, n=8
+#    - For code generation: beta=0.1-0.15, n=8-12
+#
+# ============================================================
+# Performance Tips
+# ============================================================
+#
+# 1. Batch Size Tuning:
+#    - train_batch_size: Number of prompts per batch
+#    - rollout.n: Samples per prompt
+#    - Total samples = train_batch_size × rollout.n
+#    - Adjust based on GPU memory (32 × 8 = 256 total samples works well for 8×A100)
+#
+# 2. Learning Rate:
+#    - Start with 1e-6 for 7B models
+#    - Can increase to 5e-6 if training is stable
+#    - Decrease to 5e-7 if experiencing instability
+#
+# 3. GPU Memory:
+#    - rollout.gpu_memory_utilization: 0.6 is safe
+#    - Increase to 0.7-0.75 if you have memory headroom
+#    - Decrease to 0.5 if encountering OOM errors
+#
+# 4. Gradient Checkpointing:
+#    - enable_gradient_checkpointing: True saves memory
+#    - Adds ~20% compute overhead but allows larger batches
+#
+# 5. FSDP Offloading:
+#    - param_offload/optimizer_offload: False for speed
+#    - Set to True if memory-constrained (trades compute for memory)
+#
+# ============================================================
