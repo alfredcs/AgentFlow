@@ -3,6 +3,11 @@ Example usage of the Executor with BedrockClient
 
 Demonstrates how to use the rewritten Executor that uses BedrockClient
 instead of create_llm_engine.
+
+Supports multiple model types:
+- Claude Sonnet 4.5 (ModelType.SONNET_4_5)
+- Claude Haiku 4.5 (ModelType.HAIKU_4_5)
+- Qwen 3-32B (ModelType.QWEN_3_32B)
 """
 
 import asyncio
@@ -23,16 +28,17 @@ async def main():
     print("✓ Bedrock client initialized")
     
     # Create executor
+    # Options: ModelType.SONNET_4_5, ModelType.HAIKU_4_5, ModelType.QWEN_3_32B
     executor = Executor(
         bedrock_client=bedrock,
-        model_type=ModelType.SONNET_4,
+        model_type=ModelType.SONNET_4_5,
         root_cache_dir="./executor_cache",
         max_time=120,
         verbose=True,
         temperature=0.0
     )
     print("✓ Executor initialized")
-    print(f"  - Model: {ModelType.SONNET_4.value}")
+    print(f"  - Model: {ModelType.SONNET_4_5.value}")
     print(f"  - Max execution time: 120s")
     print(f"  - Temperature: 0.0")
     print()

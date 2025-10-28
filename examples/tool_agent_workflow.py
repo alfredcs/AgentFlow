@@ -1,5 +1,10 @@
 """
 Example workflow using tool-calling agents
+
+Supports multiple model types:
+- Claude Sonnet 4.5 (ModelType.SONNET_4_5)
+- Claude Haiku 4.5 (ModelType.HAIKU_4_5)
+- Qwen 3-32B (ModelType.QWEN_3_32B)
 """
 
 import asyncio
@@ -81,6 +86,7 @@ async def main():
     ))
     
     # Create tool agent
+    # Options: ModelType.SONNET_4_5, ModelType.HAIKU_4_5, ModelType.QWEN_3_32B
     agent_config = AgentConfig(
         name="tool_agent",
         model_type=ModelType.SONNET_4_5,

@@ -3,6 +3,11 @@ Solver module for AgentFlow using Amazon Bedrock
 
 Rewritten to use BedrockClient instead of llm_engine_name.
 Orchestrates the complete AgentFlow system: planning, execution, and memory management.
+
+Supports multiple model types:
+- Claude Sonnet 4.5 (sonnet)
+- Claude Haiku 4.5 (haiku)
+- Qwen 3-32B (qwen)
 """
 
 import argparse
@@ -48,7 +53,9 @@ def make_json_serializable_truncated(obj: Any, max_length: int = 10000) -> Any:
 class Solver:
     """
     Main solver class for AgentFlow using Amazon Bedrock
-    
+
+    Supports Claude Sonnet 4.5, Claude Haiku 4.5, and Qwen 3-32B models.
+
     Orchestrates the complete workflow:
     1. Query analysis
     2. Multi-step planning and execution
@@ -400,10 +407,12 @@ def construct_solver(
 ) -> Solver:
     """
     Construct a Solver instance with BedrockClient
-    
+
+    Supports multiple model types: Claude Sonnet 4.5, Claude Haiku 4.5, and Qwen 3-32B.
+
     Args:
         bedrock_client: BedrockClient instance (created if None)
-        model_type: Bedrock model to use
+        model_type: Bedrock model to use (SONNET_4_5, HAIKU_4_5, or QWEN_3_32B)
         enabled_tools: List of enabled tool names
         toolbox_metadata: Tool metadata dictionary
         output_types: Comma-separated output types
@@ -417,7 +426,7 @@ def construct_solver(
         enable_mcp: Enable MCP tool loading
         mcp_config_path: Custom MCP config path
         mcp_servers: List of MCP servers to load (None = all)
-        
+
     Returns:
         Configured Solver instance
     """
@@ -510,8 +519,8 @@ def parse_arguments():
     parser.add_argument(
         "--model_type",
         default="sonnet",
-        choices=["sonnet", "haiku"],
-        help="Model type: sonnet (Sonnet 4.5) or haiku (Haiku 4.5)"
+        choices=["sonnet", "haiku", "qwen"],
+        help="Model type: sonnet (Sonnet 4.5), haiku (Haiku 4.5), or qwen (Qwen 3-32B)"
     )
     parser.add_argument(
         "--output_types",
@@ -575,7 +584,14 @@ def parse_arguments():
 async def main_async(args):
     """Async main function"""
     # Map model type
-    model_type = ModelType.SONNET_4_5 if args.model_type == "sonnet" else ModelType.HAIKU_4_5
+    if args.model_type == "sonnet":
+        model_type = ModelType.SONNET_4_5
+    elif args.model_type == "haiku":
+        model_type = ModelType.HAIKU_4_5
+    elif args.model_type == "qwen":
+        model_type = ModelType.QWEN_3_32B
+    else:
+        raise ValueError(f"Unknown model type: {args.model_type}")
     
     # Parse enabled tools
     enabled_tools = args.enabled_tools.split(',')

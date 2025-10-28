@@ -1,5 +1,10 @@
 """
 Example workflow using different reasoning patterns
+
+Supports multiple model types:
+- Claude Sonnet 4.5 (ModelType.SONNET_4_5)
+- Claude Haiku 4.5 (ModelType.HAIKU_4_5)
+- Qwen 3-32B (ModelType.QWEN_3_32B)
 """
 
 import asyncio
@@ -32,6 +37,7 @@ async def main():
     """
     
     # Chain-of-Thought reasoning
+    # Try SONNET_4_5, HAIKU_4_5, or QWEN_3_32B
     cot_agent = ReasoningAgent(
         config=AgentConfig(
             name="cot_reasoner",

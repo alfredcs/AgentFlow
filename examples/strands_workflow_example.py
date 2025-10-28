@@ -6,6 +6,11 @@ This example shows:
 - CloudWatch logging
 - Fault tolerance
 - Execution metrics
+
+Supports multiple model types:
+- Claude Sonnet 4.5 (ModelType.SONNET_4_5)
+- Claude Haiku 4.5 (ModelType.HAIKU_4_5)
+- Qwen 3-32B (ModelType.QWEN_3_32B)
 """
 
 import asyncio
@@ -48,6 +53,7 @@ async def main():
     print()
     
     # Step 1: Analysis agent
+    # Options: ModelType.SONNET_4_5, ModelType.HAIKU_4_5, ModelType.QWEN_3_32B
     analysis_config = AgentConfig(
         name="analyzer",
         description="Analyze data with fault tolerance",
@@ -71,6 +77,7 @@ async def main():
     print("✓ Added analysis step")
     
     # Step 2: Summary agent
+    # Use HAIKU_4_5 or QWEN_3_32B for fast summarization
     summary_config = AgentConfig(
         name="summarizer",
         description="Create executive summary",

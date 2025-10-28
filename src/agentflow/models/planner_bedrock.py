@@ -3,6 +3,11 @@ Planner module for AgentFlow using Amazon Bedrock
 
 Rewritten to use BedrockClient instead of create_llm_engine.
 Implements planning and reasoning capabilities for agent workflows.
+
+Supports multiple model types:
+- Claude Sonnet 4.5 (ModelType.SONNET_4_5)
+- Claude Haiku 4.5 (ModelType.HAIKU_4_5)
+- Qwen 3-32B (ModelType.QWEN_3_32B)
 """
 
 import json
@@ -19,7 +24,12 @@ logger = setup_logger(__name__)
 
 
 class Memory:
-    """Simple memory implementation for tracking actions"""
+    """
+    Simple memory implementation for tracking actions
+
+    Works with all supported Bedrock models (Sonnet 4.5, Haiku 4.5, Qwen 3-32B)
+    to maintain execution history across planning steps.
+    """
     
     def __init__(self):
         self.actions: List[Dict[str, Any]] = []
@@ -46,7 +56,8 @@ class Memory:
 class Planner:
     """
     Planner for agent workflows using Amazon Bedrock
-    
+
+    Supports Claude Sonnet 4.5, Claude Haiku 4.5, and Qwen 3-32B models.
     Replaces the original create_llm_engine approach with BedrockClient
     for better integration with AWS services and fault tolerance.
     """
@@ -63,10 +74,12 @@ class Planner:
     ):
         """
         Initialize planner with BedrockClient
-        
+
+        Supports SONNET_4_5, HAIKU_4_5, or QWEN_3_32B models.
+
         Args:
             bedrock_client: BedrockClient instance for model invocations
-            model_type: Bedrock model to use (default: Sonnet 4.5)
+            model_type: Bedrock model to use (SONNET_4_5, HAIKU_4_5, or QWEN_3_32B)
             toolbox_metadata: Metadata about available tools
             available_tools: List of available tool names
             verbose: Enable verbose logging
@@ -123,12 +136,15 @@ class Planner:
     ) -> str:
         """
         Generate base response using Bedrock
-        
+
+        Uses the configured model (Sonnet 4.5, Haiku 4.5, or Qwen 3-32B)
+        to generate a direct response to the question.
+
         Args:
             question: User question
             image: Optional image path
             max_tokens: Maximum tokens to generate
-            
+
         Returns:
             Generated response text
         """
@@ -168,11 +184,14 @@ class Planner:
     ) -> str:
         """
         Analyze query to determine required skills and tools
-        
+
+        Uses the configured model (Sonnet 4.5, Haiku 4.5, or Qwen 3-32B)
+        to analyze the query and identify necessary tools and skills.
+
         Args:
             question: User query
             image: Optional image path
-            
+
         Returns:
             Query analysis text
         """
@@ -351,7 +370,10 @@ Be brief and precise with insight.
     ) -> Any:
         """
         Generate the next step in the workflow
-        
+
+        Uses the configured model (Sonnet 4.5, Haiku 4.5, or Qwen 3-32B)
+        to determine the optimal next action based on context and history.
+
         Args:
             question: User question
             image: Optional image path
@@ -360,7 +382,7 @@ Be brief and precise with insight.
             step_count: Current step count
             max_step_count: Maximum allowed steps
             json_data: Optional JSON data
-            
+
         Returns:
             Next step information
         """
@@ -461,12 +483,15 @@ Ensure Tool Name matches available tools exactly.
     ) -> bool:
         """
         Verify if the memory and final answer address the question
-        
+
+        Uses the configured model (Sonnet 4.5, Haiku 4.5, or Qwen 3-32B)
+        to verify that the actions and answer adequately address the query.
+
         Args:
             question: Original question
             memory: Memory of actions taken
             final_answer: Final answer generated
-            
+
         Returns:
             True if verification passes, False otherwise
         """
@@ -526,7 +551,12 @@ Provide a brief explanation for your decision.
 
 # Synchronous wrapper for backward compatibility
 class SyncPlanner(Planner):
-    """Synchronous wrapper for Planner"""
+    """
+    Synchronous wrapper for Planner
+
+    Provides synchronous versions of all async methods.
+    Supports all Bedrock models (Sonnet 4.5, Haiku 4.5, Qwen 3-32B).
+    """
     
     def generate_base_response_sync(
         self,

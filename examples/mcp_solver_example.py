@@ -2,6 +2,11 @@
 Example: Using AgentFlow Solver with MCP Tools
 
 Demonstrates how to integrate external tools via Model Context Protocol (MCP).
+
+Supports multiple model types:
+- Claude Sonnet 4.5 (ModelType.SONNET_4_5)
+- Claude Haiku 4.5 (ModelType.HAIKU_4_5)
+- Qwen 3-32B (ModelType.QWEN_3_32B)
 """
 
 import asyncio
@@ -21,7 +26,8 @@ async def main():
     # Example 1: Using default MCP configuration
     print("Example 1: Solver with MCP Tools (Default Config)")
     print("-" * 50)
-    
+
+    # Use SONNET_4_5, HAIKU_4_5, or QWEN_3_32B
     solver = construct_solver(
         model_type=ModelType.SONNET_4_5,
         enabled_tools=["calculator"],  # Built-in tools
@@ -100,6 +106,7 @@ async def main():
     
     os.environ["AGENTFLOW_MCP_CONFIG"] = mcp_config_json
     
+    # Try QWEN_3_32B as an alternative fast model
     solver3 = construct_solver(
         model_type=ModelType.HAIKU_4_5,  # Fast model
         output_types="direct",

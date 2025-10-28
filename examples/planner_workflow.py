@@ -3,6 +3,11 @@ Example usage of the Planner with BedrockClient
 
 Demonstrates how to use the rewritten Planner that uses BedrockClient
 instead of create_llm_engine.
+
+Supports multiple model types:
+- Claude Sonnet 4.5 (ModelType.SONNET_4_5)
+- Claude Haiku 4.5 (ModelType.HAIKU_4_5)
+- Qwen 3-32B (ModelType.QWEN_3_32B)
 """
 
 import asyncio
@@ -51,9 +56,10 @@ async def main():
     }
     
     # Create planner
+    # Options: ModelType.SONNET_4_5, ModelType.HAIKU_4_5, ModelType.QWEN_3_32B
     planner = Planner(
         bedrock_client=bedrock,
-        model_type=ModelType.SONNET_4_5,  # Use Sonnet 4 for planning
+        model_type=ModelType.SONNET_4_5,  # Use Sonnet 4.5 for planning
         toolbox_metadata=toolbox_metadata,
         available_tools=available_tools,
         verbose=True,

@@ -1,3 +1,13 @@
+"""
+Data models and formatters for AgentFlow
+
+Defines Pydantic models for structured data used across the AgentFlow system.
+Works with all supported Bedrock models:
+- Claude Sonnet 4.5 (ModelType.SONNET_4_5)
+- Claude Haiku 4.5 (ModelType.HAIKU_4_5)
+- Qwen 3-32B (ModelType.QWEN_3_32B)
+"""
+
 from pydantic import BaseModel
 
 # Planner: QueryAnalysis

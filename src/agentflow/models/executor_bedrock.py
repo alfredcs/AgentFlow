@@ -3,6 +3,11 @@ Executor module for AgentFlow using Amazon Bedrock
 
 Rewritten to use BedrockClient instead of create_llm_engine.
 Handles tool command generation and execution for agent workflows.
+
+Supports multiple model types:
+- Claude Sonnet 4.5 (ModelType.SONNET_4_5)
+- Claude Haiku 4.5 (ModelType.HAIKU_4_5)
+- Qwen 3-32B (ModelType.QWEN_3_32B)
 """
 
 import importlib
@@ -78,7 +83,8 @@ def timeout_handler(signum, frame):
 class Executor:
     """
     Executor for tool commands using Amazon Bedrock
-    
+
+    Supports Claude Sonnet 4.5, Claude Haiku 4.5, and Qwen 3-32B models.
     Replaces the original create_llm_engine approach with BedrockClient
     for better integration with AWS services and fault tolerance.
     """
@@ -98,10 +104,12 @@ class Executor:
     ):
         """
         Initialize executor with BedrockClient
-        
+
+        Supports SONNET_4_5, HAIKU_4_5, or QWEN_3_32B models.
+
         Args:
             bedrock_client: BedrockClient instance for model invocations
-            model_type: Bedrock model to use (default: Sonnet 4.5)
+            model_type: Bedrock model to use (SONNET_4_5, HAIKU_4_5, or QWEN_3_32B)
             root_cache_dir: Root directory for caching
             num_threads: Number of threads for execution
             max_time: Maximum execution time in seconds
@@ -199,7 +207,10 @@ class Executor:
     ) -> Any:
         """
         Generate a tool command using Bedrock
-        
+
+        Uses the configured model (Sonnet 4.5, Haiku 4.5, or Qwen 3-32B)
+        to generate executable tool commands.
+
         Args:
             question: User question
             image: Optional image path
@@ -209,7 +220,7 @@ class Executor:
             tool_metadata: Tool metadata
             step_count: Current step count
             json_data: Optional JSON data for logging
-            
+
         Returns:
             Generated tool command
         """

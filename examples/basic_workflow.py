@@ -1,5 +1,10 @@
 """
 Basic workflow example using AgentFlow
+
+Supports multiple model types:
+- Claude Sonnet 4.5 (ModelType.SONNET_4_5) - Complex reasoning
+- Claude Haiku 4.5 (ModelType.HAIKU_4_5) - Fast, simple tasks
+- Qwen 3-32B (ModelType.QWEN_3_32B) - Alternative model
 """
 
 import asyncio
@@ -25,6 +30,7 @@ async def main():
     workflow = Workflow(workflow_config)
     
     # Step 1: Research agent (uses Sonnet 4.5 for complex reasoning)
+    # Alternative: Use ModelType.QWEN_3_32B for a different model
     research_config = AgentConfig(
         name="researcher",
         description="Research and gather information",

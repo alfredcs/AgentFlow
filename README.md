@@ -13,10 +13,11 @@ A production-ready implementation of AgentFlow using Amazon Strands SDK and Amaz
 AgentFlow is a framework for building complex agentic workflows through structured reasoning patterns. Based on the research paper ["AgentFlow: A Framework for Structured Agentic Workflows"](https://arxiv.org/pdf/2510.05592), this implementation provides a production-ready solution using:
 
 - **Amazon Strands SDK**: Agent orchestration framework
-- **Amazon Bedrock**: Managed AI service with Claude models
+- **Amazon Bedrock**: Managed AI service with Claude and Qwen models
 - **MCP**: Enable agents access tools via MCP protocol
 - **Claude Sonnet 4.5**: Primary reasoning model for complex tasks
 - **Claude Haiku 4.5**: Fast model for simple operations
+- **Qwen 3-32B**: Open source and fine-tunable fast model for agentic reasoning.
 
 ## ✨ Key Features
         
@@ -52,7 +53,7 @@ Theoretical Improvements Over GRPO
 **Known Limitations:**                                                                                                                                                                   
                                                                                                                                                                                     
 - 1. **Data Format**: Requires Parquet files with specific columns (question, answer, data_id) 
-- 2. **Model Support**: Tested with Qwen-7B; other models may need adaptation 
+- 2. **Model Support**: Tested with Qwen3-32B; other models may need adaptation 
 - 3. **Hardware**: Designed for multi-GPU training; single-GPU support limited
 - 4. **Dependencies**: Requires verl framework (external dependency)
      
@@ -198,7 +199,7 @@ python examples/basic_workflow.py
 ```
 Run a complete agentic workflow:
 ```bash
-python examples/solver_bedrock.py --prompt "<your question>"
+python examples/solver_bedrock.py --prompt "<your question>" --model_type <[sonnet|haiku|qwen]>
 ```
 
 ## 🧪 Testing

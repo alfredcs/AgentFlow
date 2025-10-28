@@ -1,5 +1,10 @@
 """
 Parallel workflow example with multiple independent agents
+
+Supports multiple model types:
+- Claude Sonnet 4.5 (ModelType.SONNET_4_5)
+- Claude Haiku 4.5 (ModelType.HAIKU_4_5)
+- Qwen 3-32B (ModelType.QWEN_3_32B)
 """
 
 import asyncio
@@ -29,6 +34,7 @@ async def main():
     ]
     
     for perspective_name, description in perspectives:
+        # Use HAIKU_4_5 or QWEN_3_32B for fast parallel execution
         agent_config = AgentConfig(
             name=f"{perspective_name}_analyst",
             description=description,
@@ -51,6 +57,7 @@ async def main():
         )
     
     # Add synthesis step that depends on all analyses
+    # Use SONNET_4_5 or QWEN_3_32B for synthesis
     synthesis_config = AgentConfig(
         name="synthesizer",
         description="Synthesize multiple perspectives",
