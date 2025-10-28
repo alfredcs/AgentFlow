@@ -2,7 +2,7 @@
 
 AgentFlow introduces a trainable agentic system that optimizes planning directly within multi-turn workflows, addressing a fundamental limitation in current tool-augmented LLMs.  This solution demonstrates that small, strategically trained agentic systems can outperform much larger monolithic models by learning effective planning through outcome-driven reinforcement learning in realistic multi-turn environments.
 
-A production-ready implementation of AgentFlow using Amazon Strands SDK and Amazon Bedrock, enabling structured agentic workflows with Claude Sonnet 4.5 and Haiku 4.5.
+A production-ready implementation of AgentFlow using Amazon Strands SDK and Amazon Bedrock, enabling structured agentic workflows with Qwen 3-32B, Claude Sonnet 4.5 and Haiku 4.5.
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -362,5 +362,3 @@ See [CHANGELOG.md](CHANGELOG.md) for version history.
 - [AgentFlow Paper](https://arxiv.org/pdf/2510.05592)
 
 ---
-
-**Built with ❤️ for production AI workflows**
