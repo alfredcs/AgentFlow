@@ -1,4 +1,4 @@
-# AgentFlow - implementation of multi-trun agentic workflow with Bedrock and MCP
+# AgentFlow - implementation of multi-turn agentic workflow with Bedrock and MCP
 
 AgentFlow introduces a trainable agentic system that optimizes planning directly within multi-turn workflows, addressing a fundamental limitation in current tool-augmented LLMs.  This solution demonstrates that small, strategically trained agentic systems can outperform much larger monolithic models by learning effective planning through outcome-driven reinforcement learning in realistic multi-turn environments.
 
